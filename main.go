@@ -7,6 +7,7 @@ import (
 	"os"
 	"io/ioutil"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 )
 
 /*func CityHandler(res http.ResponseWriter, req *http.Request) {
@@ -38,40 +39,29 @@ func main() {
 	if  port == "" {
 		port = "5000"
 	}
-	http.HandleFunc("/", IndexHandler)
-	http.HandleFunc("/vehicledetail/detail", VehicleDetailHandler)
-	err := http.ListenAndServe(":" + port, nil)
+	router := httprouter.New()
+	router.GET("/", IndexHandler)
+	router.GET("/vehicledetail/detail/:vehicleId/overview", VehicleDetailHandler)
+	err := http.ListenAndServe(":" + port, router)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
 
-func IndexHandler(res http.ResponseWriter, req *http.Request){
-	data, _ := json.Marshal("Vehicle Detail Page")
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+func IndexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params){
+	fmt.Fprint(w, "Welcome! to the Vdp in Go!\n")
 }
 
-func VehicleDetailHandler(res http.ResponseWriter, req *http.Request) {
-	vi := req.URL.Query().Get("vehicleId")
-	resp, err := http.Get("http://www.cars.com/ajax/listingsapi/1.0/listing/detail/" + vi)
-	
-	if err != nil {
-		//res writer handle err
-	}
-
+func VehicleDetailHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	resp, _ := http.Get("http://www.cars.com/ajax/listingsapi/1.0/listing/detail/" + ps.ByName("vehicleId"))
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 
 	var vd VehicleDetail 
 	json.Unmarshal(body, &vd)	
 
-//	fmt.Printf("Keith the listing id is: %d\n", vd.ListingDetail.ListingId)
-
-	res.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(res, "%d %s %s, %s", vd.ListingDetail.ModelYear, vd.ListingDetail.MakeName, vd.ListingDetail.ModelName, vd.ListingDetail.PriceFormatted)
-
-
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprintf(w, "%d %s %s, %s", vd.ListingDetail.ModelYear, vd.ListingDetail.MakeName, vd.ListingDetail.ModelName, vd.ListingDetail.PriceFormatted)
 }
 
