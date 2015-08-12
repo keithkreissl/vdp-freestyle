@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/keithkreissl/vdp",
+	"ImportPath": "github.com/keithkreissl/vdp-freestyle",
 	"GoVersion": "go1.4.2",
 	"Deps": []
 }
