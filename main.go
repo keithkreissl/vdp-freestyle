@@ -38,15 +38,23 @@ func main() {
 	if  port == "" {
 		port = "5000"
 	}
-	http.HandleFunc("/", VehicleDetailHandler)
+	http.HandleFunc("/", IndexHandler)
+	http.HandleFunc("/vehicledetail/detail", VehicleDetailHandler)
 	err := http.ListenAndServe(":" + port, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
 
+func IndexHandler(res http.ResponseWriter, req *http.Request){
+	data, _ := json.Marshal("Vehicle Detail Page")
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
 func VehicleDetailHandler(res http.ResponseWriter, req *http.Request) {
-	resp, err := http.Get("http://www.cars.com/ajax/listingsapi/1.0/listing/detail/638606908")
+	vi := req.URL.Query().Get("vehicleId")
+	resp, err := http.Get("http://www.cars.com/ajax/listingsapi/1.0/listing/detail/" + vi)
 	
 	if err != nil {
 		//res writer handle err
