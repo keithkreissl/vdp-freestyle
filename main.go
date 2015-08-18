@@ -49,7 +49,7 @@ func main() {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params){
-	fmt.Fprint(w, "Welcome! to the Vdp in Go!\n")
+	fmt.Fprint(w, "Welcome! to the Vdp in Go making a change!\n")
 }
 
 func VehicleDetailHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
